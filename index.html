@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saveeto | Biocosmética Amazónica</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: {
+              50: '#f2f7f4',
+              100: '#e1ede7',
+              600: '#2d6a4f',
+              700: '#1b4332',
+              800: '#081c15'
+            },
+            terracotta: '#d97443',
+            sand: '#fcfbf7'
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-sand text-stone-800 flex flex-col min-h-screen font-sans antialiased">
+
+  <!-- Banner Superior de Anuncio -->
+  <div class="bg-forest-800 text-stone-200 text-xs py-2 px-4 text-center font-medium">
+    🌿 Envíos a todo el Ecuador | Envío gratis en compras mayores a $35.00
+  </div>
+
+  <!-- Header / Navbar -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-stone-200 shadow-xs">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-forest-600 flex items-center justify-center text-white text-lg shadow-sm">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div>
+          <span class="text-2xl font-bold tracking-tight text-forest-800">Saveeto</span>
+          <span class="block text-[10px] uppercase tracking-widest text-stone-500 font-semibold">Biocosmética Amazónica</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button onclick="toggleCart()" class="relative p-2.5 rounded-full bg-stone-100 hover:bg-stone-200 transition text-forest-800 cursor-pointer">
+          <i class="fa-solid fa-basket-shopping text-xl"></i>
+          <span id="cart-counter" class="absolute -top-1 -right-1 bg-terracotta text-white text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-forest-50 to-sand border-b border-stone-200 py-10 px-4 text-center">
+    <div class="max-w-3xl mx-auto">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest-100 text-forest-700 text-xs font-semibold mb-3">
+        <i class="fa-solid fa-certificate text-[10px]"></i> Catálogo Oficial 2026
+      </span>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-forest-800 tracking-tight">Fórmulas botánicas conscientes y eficaces</h1>
+      <p class="text-stone-600 text-sm sm:text-base mt-2 max-w-xl mx-auto">
+        Libre de parabenos, sulfatos y fragancias artificiales. Cuidamos tu piel mientras preservamos los saberes de la Amazonía.
+      </p>
+    </div>
+  </section>
+
+  <!-- Controles y Filtros -->
+  <div class="max-w-6xl mx-auto px-4 pt-8 w-full">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-stone-200 pb-4">
+      <!-- Filtros por Categoría -->
+      <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto py-1">
+        <button onclick="filterCategory('todos')" class="cat-pill active-cat px-4 py-2 rounded-full text-xs font-bold transition shadow-xs whitespace-nowrap bg-forest-700 text-white cursor-pointer" data-cat="todos">Todos los productos</button>
+        <button onclick="filterCategory('capilar')" class="cat-pill px-4 py-2 rounded-full text-xs font-bold transition shadow-xs whitespace-nowrap bg-white text-stone-600 hover:bg-stone-100 border border-stone-200 cursor-pointer" data-cat="capilar">Cuidado Capilar</button>
+        <button onclick="filterCategory('facial')" class="cat-pill px-4 py-2 rounded-full text-xs font-bold transition shadow-xs whitespace-nowrap bg-white text-stone-600 hover:bg-stone-100 border border-stone-200 cursor-pointer" data-cat="facial">Cuidado Facial</button>
+        <button onclick="filterCategory('corporal')" class="cat-pill px-4 py-2 rounded-full text-xs font-bold transition shadow-xs whitespace-nowrap bg-white text-stone-600 hover:bg-stone-100 border border-stone-200 cursor-pointer" data-cat="corporal">Cuerpo & Higiene</button>
+        <button onclick="filterCategory('eco')" class="cat-pill px-4 py-2 rounded-full text-xs font-bold transition shadow-xs whitespace-nowrap bg-white text-stone-600 hover:bg-stone-100 border border-stone-200 cursor-pointer" data-cat="eco">Mascotas & Hogar</button>
+      </div>
+
+      <!-- Buscador en tiempo real -->
+      <div class="relative w-full sm:w-64">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-stone-400 text-xs"></i>
+        <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="Buscar producto o ingrediente..." class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-stone-300 rounded-full focus:outline-none focus:border-forest-600">
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal de Productos -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <!-- Inyectado por JS -->
+    </div>
+  </main>
+
+  <!-- Notificación flotante (Toast) al agregar producto -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-forest-800 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+    <span id="toast-msg" class="text-xs font-medium">Producto agregado a tu bolsa</span>
+  </div>
+
+  <!-- Footer Informativo -->
+  <footer class="bg-forest-800 text-stone-300 text-xs py-10 px-4 mt-12 border-t border-forest-700">
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h4 class="text-white font-bold text-sm mb-2">Saveeto Biocosmética</h4>
+        <p class="text-stone-400 leading-relaxed">Fusión de tradición amazónica e innovación científica. Trabajamos con comunidades locales en la provisión justa de materias primas.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold text-sm mb-2">Garantía Botánica</h4>
+        <ul class="space-y-1 text-stone-400">
+          <li>✓ 100% libre de crueldad animal</li>
+          <li>✓ Empaques sostenibles y biodegradables</li>
+          <li>✓ Sin parabenos, siliconas ni sulfatos</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold text-sm mb-2">Contacto Directo</h4>
+        <p class="text-stone-400">WhatsApp Oficial: +593 96 380 4459</p>
+        <p class="text-stone-400">Instagram: @saveeto</p>
+        <p class="text-stone-400 mt-2">Amazonía / Quito, Ecuador</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Drawer Lateral: Carrito de Compras (Oculto por defecto con clase hidden) -->
+  <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
+    <!-- Fondo oscuro -->
+    <div class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs transition-opacity" onclick="toggleCart()"></div>
+    
+    <!-- Panel del Carrito -->
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-6">
+      <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col relative z-10">
+        
+        <!-- Header Carrito -->
+        <div class="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-bag-shopping text-forest-700 text-lg"></i>
+            <h2 class="font-bold text-stone-800 text-base">Bolsa de Compras</h2>
+          </div>
+          <button onclick="toggleCart()" class="text-stone-400 hover:text-stone-700 p-1 cursor-pointer">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Lista de Items -->
+        <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-stone-100">
+          <!-- Inyectado por JS -->
+        </div>
+
+        <!-- Totales y Acción -->
+        <div class="p-4 border-t border-stone-200 bg-stone-50 space-y-3">
+          <div class="flex justify-between text-stone-600 text-xs">
+            <span>Subtotal de productos:</span>
+            <span id="cart-subtotal" class="font-bold text-stone-800 text-sm">$0.00</span>
+          </div>
+
+          <div id="free-shipping-note" class="text-[11px] p-2 rounded bg-forest-50 border border-forest-100 text-forest-700 font-medium">
+            Agrega $35.00 para recibir <strong>Envío Gratis</strong>
+          </div>
+
+          <button onclick="openCheckoutModal()" id="btn-checkout" class="w-full bg-forest-700 hover:bg-forest-800 text-white font-bold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 disabled:opacity-40 cursor-pointer">
+            <span>Procesar Orden Directa</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Checkout Automatizado -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-xs p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto relative z-10">
+      
+      <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-stone-900">Finalizar Pedido</h3>
+          <p class="text-[11px] text-stone-500">Sin demoras en chat: tu orden se formatea de forma instantánea.</p>
+        </div>
+        <button onclick="closeCheckoutModal()" class="text-stone-400 hover:text-stone-700 cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="order-form" onsubmit="processOrder(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Nombre y Apellido *</label>
+          <input required type="text" id="cust-name" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:border-forest-600" placeholder="Ej. Camila Paredes">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-stone-700 mb-1">WhatsApp de contacto *</label>
+            <input required type="tel" id="cust-phone" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:border-forest-600" placeholder="099xxxxxxx">
+          </div>
+          <div>
+            <label class="block font-semibold text-stone-700 mb-1">Zona de Destino *</label>
+            <select id="cust-zone" onchange="calculateShipping()" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:border-forest-600 bg-white cursor-pointer">
+              <option value="quito">Quito / Valles ($3.50)</option>
+              <option value="provincias">Otras Provincias ($5.50)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Dirección completa de Entrega *</label>
+          <input required type="text" id="cust-addr" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:border-forest-600" placeholder="Calle principal, número de casa/depto y referencia">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Método de Pago *</label>
+          <select id="cust-payment" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:border-forest-600 bg-white cursor-pointer">
+            <option value="Payphone">Tarjeta de Débito / Crédito (Payphone)</option>
+            <option value="Transferencia">Transferencia Bancaria (Banco Pichincha / Guayaquil)</option>
+          </select>
+        </div>
+
+        <!-- Desglose Final -->
+        <div class="bg-forest-50 p-3 rounded-xl border border-forest-100 space-y-1.5 text-stone-700">
+          <div class="flex justify-between">
+            <span>Subtotal:</span>
+            <span id="modal-subtotal" class="font-bold">$0.00</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Costo de Envío:</span>
+            <span id="modal-shipping" class="font-bold">$3.50</span>
+          </div>
+          <div class="flex justify-between text-forest-800 text-sm font-extrabold border-t border-forest-200 pt-1.5">
+            <span>Total a Liquidar:</span>
+            <span id="modal-total">$0.00</span>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-forest-700 hover:bg-forest-800 text-white font-bold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 text-sm cursor-pointer">
+          <i class="fa-brands fa-whatsapp text-lg"></i>
+          <span>Enviar Pedido a Saveeto</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Catálogo 2026 de Saveeto
+    const catalog = [
+      {
+        id: "sh-anticaida",
+        name: "Shampoo Sólido Anticaída",
+        category: "capilar",
+        price: 5.50,
+        size: "50 g",
+        tag: "Anticaída",
+        desc: "Revitalizador y tonificante con aceite de ricino y albahaca. Fortifica la raíz.",
+        badge: null
+      },
+      {
+        id: "sh-anticaspa",
+        name: "Shampoo Sólido Purificante (Anticaspa)",
+        category: "capilar",
+        price: 5.50,
+        size: "50 g",
+        tag: "Anticaspa",
+        desc: "Romero purificante y arcilla verde. Regula el exceso de grasa y deja frescura.",
+        badge: "Más Vendido"
+      },
+      {
+        id: "sh-detox",
+        name: "Shampoo Sólido Détox",
+        category: "capilar",
+        price: 5.00,
+        size: "50 g",
+        tag: "Limpieza Profunda",
+        desc: "Carbón activado y menta. Remueve acumulación química sin resecar.",
+        badge: null
+      },
+      {
+        id: "sh-crecimiento",
+        name: "Shampoo Crecimiento",
+        category: "capilar",
+        price: 5.00,
+        size: "50 g",
+        tag: "Estimulante",
+        desc: "Ortiga y romero. Activa la circulación capilar y aporta brillo saludable.",
+        badge: null
+      },
+      {
+        id: "sh-normal",
+        name: "Shampoo Cabello Normal",
+        category: "capilar",
+        price: 5.00,
+        size: "50 g",
+        tag: "Equilibrante",
+        desc: "Avena, manzanilla y aceite esencial de rosas. Suave y delicado.",
+        badge: null
+      },
+      {
+        id: "ac-coco",
+        name: "Acondicionador Sólido de Coco",
+        category: "capilar",
+        price: 4.75,
+        size: "50 g",
+        tag: "2 en 1",
+        desc: "Acondiciona y sirve como crema de peinar sin siliconas ni parabenos.",
+        badge: null
+      },
+      {
+        id: "aceite-ungurahua",
+        name: "Aceite de Ungurahua Puro",
+        category: "capilar",
+        price: 6.50,
+        size: "30 mL",
+        tag: "Nutrición Pura",
+        desc: "100% puro de la Amazonía. Nutre la fibra y disminuye la caída por quiebre.",
+        badge: "Ancestral"
+      },
+      {
+        id: "cepillo-bambu",
+        name: "Cepillo de Bambú Viajero",
+        category: "capilar",
+        price: 4.50,
+        size: "14.5 x 6 cm",
+        tag: "Antiestático",
+        desc: "Cerdas de bambú natural. Evita el frizz y desenreda suavemente.",
+        badge: "Zero Waste"
+      },
+      {
+        id: "jabon-drago",
+        name: "Jabón Sangre de Drago",
+        category: "facial",
+        price: 3.50,
+        size: "65 g",
+        tag: "Cicatrizante",
+        desc: "Antibacterial y calmante. Ideal para combatir acné y revitalizar la piel.",
+        badge: "Más Vendido"
+      },
+      {
+        id: "jabon-arroz",
+        name: "Jabón de Polvo de Arroz",
+        category: "facial",
+        price: 3.90,
+        size: "65 g",
+        tag: "Aclarante",
+        desc: "Con vitamina C para atenuar manchas ocasionadas por sol o acné.",
+        badge: "Más Vendido"
+      },
+      {
+        id: "jabon-carbon",
+        name: "Jabón de Carbón Activado",
+        category: "facial",
+        price: 3.50,
+        size: "65 g",
+        tag: "Anti-Acné",
+        desc: "Limpieza profunda con menta energizante. Ideal para piel mixta a grasa.",
+        badge: null
+      },
+      {
+        id: "serum-vitc",
+        name: "Sérum Facial Vitamina C 15%",
+        category: "facial",
+        hasVariants: true,
+        variants: [
+          { label: "10 mL", price: 6.00 },
+          { label: "30 mL", price: 10.00 }
+        ],
+        price: 10.00,
+        size: "Presentación variable",
+        tag: "Antioxidante",
+        desc: "Formulado con hidrolato de Churiyuyo amazónico y vitamina C pura.",
+        badge: "Destacado"
+      },
+      {
+        id: "desodorante-menta",
+        name: "Desodorante Natural (Menta / Alumbre)",
+        category: "corporal",
+        price: 4.75,
+        size: "40 g",
+        tag: "Sin Aluminio",
+        desc: "Piedra de alumbre, coco y vitamina E. Admite compra de refill.",
+        badge: "Más Vendido"
+      },
+      {
+        id: "pasta-dental",
+        name: "Pasta Dental Natural Sin Flúor",
+        category: "corporal",
+        price: 3.60,
+        size: "40 g",
+        tag: "Sensibilidad",
+        desc: "En crema con menta. Hasta 70 lavadas, ideal encías sensibles.",
+        badge: null
+      },
+      {
+        id: "jabon-reciclado",
+        name: "Jabón de Aceite Reciclado",
+        category: "eco",
+        price: 1.50,
+        size: "150 g",
+        tag: "Hogar Ecológico",
+        desc: "Elaborado por mujeres Kichwas de la comunidad de Atacapi, Napo.",
+        badge: "Comunidad"
+      },
+      {
+        id: "sh-canino",
+        name: "Shampoo Sólido Canino Antipulgas",
+        category: "eco",
+        price: 2.00,
+        size: "35 g",
+        tag: "Mascotas",
+        desc: "Menta, avena y vinagre natural para repeler pulgas y cuidar el pelaje.",
+        badge: null
+      }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem('saveeto_cart')) || [];
+    let currentCategory = 'todos';
+
+    function saveCart() {
+      localStorage.setItem('saveeto_cart', JSON.stringify(cart));
+      updateCartUI();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      const toastMsg = document.getElementById("toast-msg");
+      toastMsg.innerText = msg;
+      toast.classList.remove("opacity-0");
+      setTimeout(() => {
+        toast.classList.add("opacity-0");
+      }, 2000);
+    }
+
+    function renderProducts(items) {
+      const grid = document.getElementById("product-grid");
+      if (items.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-stone-400 text-sm">No encontramos productos que coincidan con tu búsqueda.</div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(p => {
+        return `
+          <div class="bg-white rounded-2xl border border-stone-200 p-4 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <span class="text-[10px] font-bold text-forest-700 bg-forest-50 px-2 py-0.5 rounded-full border border-forest-100">${p.tag}</span>
+                ${p.badge ? `<span class="text-[10px] font-extrabold text-white bg-terracotta px-2 py-0.5 rounded-full">${p.badge}</span>` : ''}
+              </div>
+
+              <div class="h-32 bg-stone-100/70 rounded-xl mb-3 flex items-center justify-center text-forest-700/40">
+                <i class="fa-solid fa-leaf text-3xl"></i>
+              </div>
+
+              <h3 class="font-bold text-stone-900 text-sm leading-snug">${p.name}</h3>
+              <p class="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">${p.desc}</p>
+              
+              ${p.hasVariants ? `
+                <div class="mt-2.5">
+                  <label class="text-[10px] font-bold text-stone-600 block mb-1">Tamaño:</label>
+                  <select id="var-${p.id}" onchange="updateVariantPrice('${p.id}')" class="text-xs w-full bg-stone-50 border border-stone-200 rounded px-2 py-1 focus:outline-none cursor-pointer">
+                    ${p.variants.map(v => `<option value="${v.price}">${v.label} - $${v.price.toFixed(2)}</option>`).join('')}
+                  </select>
+                </div>
+              ` : `
+                <span class="inline-block text-[11px] text-stone-400 mt-2 font-medium">${p.size}</span>
+              `}
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
+              <span id="price-display-${p.id}" class="text-lg font-extrabold text-forest-800">$${(p.hasVariants ? p.variants[0].price : p.price).toFixed(2)}</span>
+              <button onclick="addToCart('${p.id}')" class="bg-forest-700 hover:bg-forest-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-plus text-[10px]"></i>
+                <span>Agregar</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateVariantPrice(productId) {
+      const select = document.getElementById(`var-${productId}`);
+      const priceDisplay = document.getElementById(`price-display-${productId}`);
+      priceDisplay.innerText = `$${parseFloat(select.value).toFixed(2)}`;
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll(".cat-pill").forEach(btn => {
+        if(btn.dataset.cat === cat) {
+          btn.className = "cat-pill active-cat px-4 py-2 rounded-full text-xs font-bold transition shadow-xs whitespace-nowrap bg-forest-700 text-white cursor-pointer";
+        } else {
+          btn.className = "cat-pill px-4 py-2 rounded-full text-xs font-bold transition shadow-xs whitespace-nowrap bg-white text-stone-600 hover:bg-stone-100 border border-stone-200 cursor-pointer";
+        }
+      });
+      applyFilters();
+    }
+
+    function searchProducts() {
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      let filtered = catalog;
+
+      if (currentCategory !== 'todos') {
+        filtered = filtered.filter(p => p.category === currentCategory);
+      }
+
+      if (query.trim() !== '') {
+        filtered = filtered.filter(p => 
+          p.name.toLowerCase().includes(query) || 
+          p.desc.toLowerCase().includes(query) ||
+          p.tag.toLowerCase().includes(query)
+        );
+      }
+
+      renderProducts(filtered);
+    }
+
+    function addToCart(productId) {
+      const prod = catalog.find(p => p.id === productId);
+      let selectedPrice = prod.price;
+      let variantLabel = "";
+
+      if (prod.hasVariants) {
+        const select = document.getElementById(`var-${prod.id}`);
+        selectedPrice = parseFloat(select.value);
+        variantLabel = ` (${select.options[select.selectedIndex].text.split(' - ')[0]})`;
+      }
+
+      const cartItemId = `${prod.id}${variantLabel}`;
+      const existing = cart.find(item => item.cartItemId === cartItemId);
+
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({
+          cartItemId,
+          name: `${prod.name}${variantLabel}`,
+          price: selectedPrice,
+          qty: 1
+        });
+      }
+
+      saveCart();
+      showToast(`¡${prod.name} agregado a tu bolsa!`);
+    }
+
+    function changeQty(cartItemId, delta) {
+      const item = cart.find(i => i.cartItemId === cartItemId);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.cartItemId !== cartItemId);
+      }
+      saveCart();
+    }
+
+    function updateCartUI() {
+      const badge = document.getElementById("cart-counter");
+      const totalCount = cart.reduce((acc, item) => acc + item.qty, 0);
+
+      if (totalCount > 0) {
+        badge.innerText = totalCount;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
+
+      const container = document.getElementById("cart-items");
+      const checkoutBtn = document.getElementById("btn-checkout");
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-stone-400 space-y-2">
+            <i class="fa-solid fa-basket-shopping text-3xl text-stone-300"></i>
+            <p class="text-xs">Tu bolsa está vacía</p>
+          </div>`;
+        checkoutBtn.disabled = true;
+      } else {
+        checkoutBtn.disabled = false;
+        container.innerHTML = cart.map(item => `
+          <div class="flex items-center justify-between py-2.5">
+            <div class="pr-2 max-w-[65%]">
+              <h4 class="font-bold text-stone-800 text-xs truncate">${item.name}</h4>
+              <span class="text-[11px] text-stone-500 font-medium">$${item.price.toFixed(2)} c/u</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="changeQty('${item.cartItemId}', -1)" class="w-6 h-6 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs cursor-pointer">-</button>
+              <span class="text-xs font-semibold w-4 text-center">${item.qty}</span>
+              <button onclick="changeQty('${item.cartItemId}', 1)" class="w-6 h-6 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs cursor-pointer">+</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      document.getElementById("cart-subtotal").innerText = `$${subtotal.toFixed(2)}`;
+
+      const shippingNote = document.getElementById("free-shipping-note");
+      if (subtotal >= 35.00) {
+        shippingNote.innerHTML = "🎉 ¡Felicidades! Tienes <strong>Envío Gratis</strong>";
+        shippingNote.className = "text-[11px] p-2 rounded bg-forest-100 text-forest-800 font-semibold";
+      } else {
+        const remaining = (35.00 - subtotal).toFixed(2);
+        shippingNote.innerHTML = `Agrega <strong>$${remaining}</strong> más para tener <strong>Envío Gratis</strong>`;
+        shippingNote.className = "text-[11px] p-2 rounded bg-forest-50 border border-forest-100 text-forest-700 font-medium";
+      }
+    }
+
+    function toggleCart() {
+      const drawer = document.getElementById("cart-drawer");
+      drawer.classList.toggle("hidden");
+    }
+
+    function openCheckoutModal() {
+      toggleCart();
+      calculateShipping();
+      document.getElementById("checkout-modal").classList.remove("hidden");
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById("checkout-modal").classList.add("hidden");
+    }
+
+    function calculateShipping() {
+      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      const zone = document.getElementById("cust-zone").value;
+      let shipping = 0;
+
+      if (subtotal < 35.00) {
+        shipping = (zone === 'quito') ? 3.50 : 5.50;
+      }
+
+      const total = subtotal + shipping;
+      document.getElementById("modal-subtotal").innerText = `$${subtotal.toFixed(2)}`;
+      document.getElementById("modal-shipping").innerText = shipping === 0 ? "GRATIS" : `$${shipping.toFixed(2)}`;
+      document.getElementById("modal-total").innerText = `$${total.toFixed(2)}`;
+    }
+
+    function processOrder(e) {
+      e.preventDefault();
+      const name = document.getElementById("cust-name").value;
+      const phone = document.getElementById("cust-phone").value;
+      const zone = document.getElementById("cust-zone").options[document.getElementById("cust-zone").selectedIndex].text;
+      const addr = document.getElementById("cust-addr").value;
+      const payment = document.getElementById("cust-payment").value;
+      
+      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      let shipping = (subtotal >= 35.00) ? 0 : (document.getElementById("cust-zone").value === 'quito' ? 3.50 : 5.50);
+      const total = subtotal + shipping;
+
+      const itemsList = cart.map(i => `• ${i.qty}x ${i.name} ($${(i.price * i.qty).toFixed(2)})`).join('%0A');
+      
+      const message = `🌿 *NUEVO PEDIDO WEB - SAVEETO*%0A%0A` +
+        `👤 *Cliente:* ${encodeURIComponent(name)}%0A` +
+        `📞 *Teléfono:* ${encodeURIComponent(phone)}%0A` +
+        `📍 *Destino:* ${encodeURIComponent(zone)}%0A` +
+        `🏠 *Dirección:* ${encodeURIComponent(addr)}%0A` +
+        `💳 *Método de Pago:* ${encodeURIComponent(payment)}%0A%0A` +
+        `📦 *Productos:*%0A${itemsList}%0A%0A` +
+        `Subtotal: $${subtotal.toFixed(2)}%0A` +
+        `Envío: ${shipping === 0 ? 'GRATIS' : '$' + shipping.toFixed(2)}%0A` +
+        `💰 *TOTAL A PAGAR: $${total.toFixed(2)}*%0A%0A` +
+        `_Adjunto el comprobante o solicito link de Payphone._`;
+
+      const saveetoPhone = "593963804459";
+      const waUrl = `https://wa.me/${saveetoPhone}?text=${message}`;
+
+      cart = [];
+      saveCart();
+      closeCheckoutModal();
+
+      window.open(waUrl, '_blank');
+    }
+
+    // Carga inicial
+    renderProducts(catalog);
+    updateCartUI();
+  </script>
+</body>
+</html>
